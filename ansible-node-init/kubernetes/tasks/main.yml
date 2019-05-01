@@ -1,0 +1,72 @@
+---
+- name: Add Google apt key.
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+  register: add_repository_key_google
+  ignore_errors: true
+
+- name: Add Kubernetes APT repository
+  apt_repository:
+    repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+    filename: kubernetes.list
+    update_cache: true
+
+- name: Update apt local
+  apt:
+     update_cache: yes
+
+- name: Install kubelet
+  package:
+    name: kubelet
+    state: present
+
+- name: Install k8s cni
+  package:
+    name: kubernetes-cni
+    state: present
+
+- name: Install NFS
+  package:
+    name: nfs-common
+    state: present
+
+- name: Install kubeadm
+  package:
+    name: kubeadm
+    state: present
+
+- name: Add ip_vs kernel module
+  modprobe:
+    name: ip_vs
+    state: present
+
+- name: Add ip_vs_wrr kernel module
+  modprobe:
+    name: ip_vs_wrr
+    state: present
+
+- name: Add ip_vs_sh kernel module
+  modprobe:
+    name: ip_vs_sh
+    state: present
+
+- name: Add nf_conntrack_ipv4 kernel module
+  modprobe:
+    name: nf_conntrack_ipv4
+    state: present
+
+# Disable Swap because Kubernetes doesn't like it and kubeadm will complain.
+
+- name: Turn off swap
+  command: dphys-swapfile swapoff
+  when: ansible_swaptotal_mb > 0
+
+- name: Uninstall swap
+  command: dphys-swapfile uninstall
+  when: ansible_swaptotal_mb > 0
+
+- name: Remove swapfile usage
+  command: update-rc.d dphys-swapfile remove
+  when: ansible_swaptotal_mb > 0

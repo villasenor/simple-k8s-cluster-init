@@ -1,0 +1,8 @@
+- name: Get ready for kubeadm init
+  hosts: nodes
+  remote_user: user
+  become: yes
+  become_method: sudo
+  roles:
+    - docker
+    - kubernetes
