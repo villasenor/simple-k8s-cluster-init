@@ -1,6 +1,6 @@
-[![Travis Build Image]][Travis Build Status]
-
 # simple-k8s-cluster-init
+
+[![Travis Build Image]][Travis Build Status]
 
 Quick and simple Ansible playbook to
 initialize fresh Linux machines
